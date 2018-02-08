@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyMushroom : EnemyBase {
+public class MapElementWallSlopeBottom : MapElement {
 
-	public SpriteRenderer SptMain;
+	void Awake() {
+		type = Type_WallSlopeBottom;
+	}
 
 	// Use this for initialization
 	void Start () {
-		
+
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
-		
+
+	}
+
+	public override int IsBlock( int dir ) {
+		return Block_Hard;
 	}
 }

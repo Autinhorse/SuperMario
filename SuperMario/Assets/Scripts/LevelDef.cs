@@ -100,9 +100,48 @@ public class LevelElementStop : LevelElement{
 }
 
 public class LevelElementQuestion : LevelElement{
-	public int elementType;
+	public const int Type_CoinOne = 0;
+	public const int Type_CoinFive = 1;
+	public const int Type_Mushroom = 3;
+	public const int Type_AwardLife = 4;
+	public const int Type_AwardStar = 5;
 
-	public LevelElementQuestion( int vX, int vY, int vT ) :base( MapElement.Type_Stop, vX, vY ) {
+	public const int Sprite_Question = 0;
+	public const int Sprite_Brick = 1;
+
+
+	public int elementType;
+	public int spriteType;
+
+	public LevelElementQuestion( int vX, int vY, int vT, int vS ) :base( MapElement.Type_Question, vX, vY ) {
 		elementType = vT;
+		spriteType = vS;
 	}
 }
+
+public class LevelElementEnemyMushroon : LevelElement{
+	public int dir;
+	public int triggerDir;
+	public int subtype;
+
+	public LevelElementEnemyMushroon( int vX, int vY, int vD, int vTriggerDir, int vT ) :base( MapElement.Type_EnemyMushroom, vX, vY ) {
+		dir = vD;
+		triggerDir = vTriggerDir;
+		subtype = vT;
+	}
+}
+
+public class LevelElementEnemyPiranha : LevelElement{
+	public int dir;
+	public float delay;
+	public float hideDuration;
+	public float showDuration;
+
+	public LevelElementEnemyPiranha( int vX, int vY, int vD, float vDelay, float vHideDuration, float vShowDuration ) :base( MapElement.Type_Piranha, vX, vY ) {
+		dir = vD;
+		delay = vDelay;
+		hideDuration = vHideDuration;
+		showDuration = vShowDuration;
+	}
+}
+

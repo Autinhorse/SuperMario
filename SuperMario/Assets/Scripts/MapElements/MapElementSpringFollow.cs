@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyBase : MonoBehaviour {
+public class MapElementSpringFollow : MapElement {
+
+	void Awake() {
+		type = Type_SpringFollow;
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -12,5 +16,9 @@ public class EnemyBase : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public override int IsBlock( int dir ) {
+		return Block_Hard;
 	}
 }

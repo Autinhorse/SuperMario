@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapElementCloud : MapElement {
+public class MapElementEndFollow : MapElement {
 
 	void Awake() {
-		type = Type_Cloud;
+		type = Type_EndFollow;
 	}
 
 	// Use this for initialization
@@ -16,14 +16,5 @@ public class MapElementCloud : MapElement {
 	// Update is called once per frame
 	void Update () {
 		
-	}
-
-	public override int IsBlock( int dir ) {
-		if(dir==MapElement.Dir_Up) {
-			return Block_Hard;
-		}
-
-		return Block_None;
-
 	}
 }

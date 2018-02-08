@@ -44,9 +44,9 @@ public class ShowFps : MonoBehaviour
         
         style = new GUIStyle();
         style.normal.textColor = color;
-        style.fontSize = 50;
+        style.fontSize = 20;
 
-        float w = 320, h = 80, off = 50;
+        float w = 240, h = 20, off = 20;
 
         switch (position)
         {

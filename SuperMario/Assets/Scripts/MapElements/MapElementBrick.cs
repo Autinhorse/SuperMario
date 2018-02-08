@@ -23,7 +23,7 @@ public class MapElementBrick : MapElement {
 		
 	}
 
-	public override void HitBottom() {
+	public override void HitBottom(bool hitForward) {
 		if (_isBroken == true) {
 			return;
 		}

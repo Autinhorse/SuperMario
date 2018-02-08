@@ -42,21 +42,31 @@ public class MapElement : MonoBehaviour {
 	public const int Type_WallSlope03 = 4;				// 1:2向下的斜坡			
 	public const int Type_WallSlope04 = 5;				// 1:1（45度）向下的斜坡
 	public const int Type_Brick = 6;					// 这个是普通什么都没有的砖块
-	public const int Type_Question = 7;     			// 这个是普通的只有一个金币的问号方块
+	public const int Type_WallBoard = 7;     			// 这个是可以从下方跳上去的平板
 	public const int Type_BrickCoin = 8;				// 这个是藏了一个金币的砖块
 	public const int Type_Coin = 9;						// 这个是一个金币
-	public const int Type_Cloud = 10;					// a 这个是一个云朵
-	public const int Type_EnemyMushroom = 11;  	 		// b 这个是一个蘑菇敌人
-	public const int Type_End = 12;   					// c 这个是结束
-	public const int Type_WallSlope01Follow = 13; 		// d 这个是结束
-	public const int Type_WallSlope03Follow = 14; 		// e 这个是结束
+	public const int Type_Cloud = 10;					// A 这个是一个云朵
+	//public const int Type_EnemyMushroom = 11;  	 	// B 这个是一个蘑菇敌人
+	public const int Type_End = 12;   					// C 这个是结束
+	public const int Type_WallSlope01Follow = 13; 		// D 这个是1:2上坡后面一个
+	public const int Type_WallSlope03Follow = 14; 		// E 这个是1:2下坡后面一个
+	public const int Type_EndFollow = 15; 				// F 这个是结束位置上面一个
+	public const int Type_WallSlopeBottom = 16;			// G 斜坡下面
+	public const int Type_Spring = 17;					// H 斜坡下面
+	public const int Type_SpringFollow = 18;			// I 斜坡下面
 
 
-	public const int Type_CoinArrow = 10001;	// 这个是一个金币产生器，沿指定方向产生四个金币
-	public const int Type_Pillar = 10002;		// 这个是一个柱子
-	public const int Type_Stop = 10003;			// 这个是一个停止位置
-	public const int Type_Life = 10004;			// 这个是藏在问题方块里面的，加一条命
-	public const int Type_Mushroom = 10005;		// 这个是藏在问题方块里面的，加一条命
+	public const int Type_CoinArrow = 10001;			// 这个是一个金币产生器，沿指定方向产生四个金币
+	public const int Type_Pillar = 10002;				// 这个是一个柱子
+	public const int Type_Stop = 10003;					// 这个是一个停止位置
+	//public const int Type_AwardLife = 10004;			// 这个是藏在问题方块里面的，加一条命
+	public const int Type_EnemyMushroom = 10005;		// 敌人，普通蘑菇
+	public const int Type_Question = 10006;				// 问题方块
+	public const int Type_CoinEject = 10007;			// 撞了方块以后弹出来的金币
+	public const int Type_Mushroom = 10008;				// 撞了出现的蘑菇，吃了可以变大
+	public const int Type_Piranha = 10009;				// 食人花
+	public const int Type_BounceAward = 10010;			// 撞了方块以后出现的星星，吃了一段时间内可以吸引附近的金币或无敌
+	public const int Type_PiranhaFollow = 10011;		// 食人花的占位元素
 
 	public SpriteRenderer SptMain;
 
@@ -104,6 +114,6 @@ public class MapElement : MonoBehaviour {
 		return Block_None;
 	}
 
-	public virtual void HitBottom() {
+	public virtual void HitBottom(bool hitForward) {
 	}
 }

@@ -23,7 +23,7 @@ public class GameController : MonoBehaviour {
 	bool _mousePressed;
 
 
-	CreateLevels _levels;
+
 	GameMap _gameMap;
 
 	public const int Status_MainPage = 0;
@@ -43,19 +43,13 @@ public class GameController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		_levels = new CreateLevels ();
+		
 
 		_mousePressed = false;
 
 		_gameMap = GameMap.instance;
 
-		_gameMap.CreateLevel (_levels.GetLevelDef (0));
 
-		Vector3 actorPos = _gameMap.GetActorCurrentPosition ();
-		actorPos.z = -25;
-
-		_gameMap.ShowScreenCover (actorPos, false, null);
-		_gameMap.HideScreenCover( actorPos, HideScreenCoverCompleted );
 	}
 
 	// Update is called once per frame

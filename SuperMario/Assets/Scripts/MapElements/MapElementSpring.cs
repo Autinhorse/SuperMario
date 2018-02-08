@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapElementCloud : MapElement {
+public class MapElementSpring : MapElement {
 
 	void Awake() {
-		type = Type_Cloud;
+		type = Type_Spring;
 	}
 
 	// Use this for initialization
@@ -19,11 +19,6 @@ public class MapElementCloud : MapElement {
 	}
 
 	public override int IsBlock( int dir ) {
-		if(dir==MapElement.Dir_Up) {
-			return Block_Hard;
-		}
-
-		return Block_None;
-
+		return Block_Hard;
 	}
 }

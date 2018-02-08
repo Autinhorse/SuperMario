@@ -20,6 +20,9 @@ public class ActorController : MonoBehaviour {
 	public const int Status_RunSlope02 = 13;
 	public const int Status_RunSlope03 = 14;
 	public const int Status_RunSlope04 = 15;
+	public const int Status_Stop = 16;
+	public const int Status_GameOver = 17;
+	public const int Status_SpringUp = 18;
 
 	public float ActorSpeedX;					// 水平速度
 	public float ActorClimbDuration;			// 前面右一层障碍的时候，翻上障碍需要的时间
@@ -31,6 +34,7 @@ public class ActorController : MonoBehaviour {
 	public float ActorJumpUpTopHeight;			// 在进入状态是Status_JumpTop状态后，可以上升的高度
 	public float ActorJumpUpPressTimeRate;		// 
 	public float ActorJumpUpFallSpeedRate;		// 经过状态是Status_JumpTop状态后开始下降，下降的速度相对于上升速度的比例
+	public float ActorBounceUpDuration;			// 踩中敌人后自动弹起向上跳的时间
 
 	public float ActorBlockedDuration;			// 前方被阻挡后，在原地跳动，一次跳动的时间
 	public float ActorBlockedJumpHeight;		// 前方被阻挡后，在原地跳动，一次跳动的高度
@@ -53,6 +57,17 @@ public class ActorController : MonoBehaviour {
 	public const int Ani_Blocked = 10;
 	public const int Ani_JumpHitTop = 11;
 	public const int Ani_JumpupBlocked = 12;
+	public const int Ani_Stop = 13;
+
+	public static ActorController instance {
+		get {
+			return _instance;
+		}
+	}
+	static ActorController _instance;
+
+	float Gravity;
+		
 
 	const float Slope01Angle = 26.4774f;
 	const float Slope02Angle = 45.0f;
@@ -60,6 +75,8 @@ public class ActorController : MonoBehaviour {
 
 	int _status;
 	int _animation;
+
+	float _magnetTimer;
 
 	GameMap _gameMap;
 
@@ -87,6 +104,7 @@ public class ActorController : MonoBehaviour {
 
 	float _timer;
 	float _jumpUpTimer;
+	float _stopTimer;
 	bool _jumpUpPressed;
 	bool _jumpUpPressTreated;
 	float _jumpUpTopRate;
@@ -95,7 +113,11 @@ public class ActorController : MonoBehaviour {
 
 	float _targetY;
 
+	MapElementStop _stopElement;
+
 	void Awake() {
+		_instance = this;
+
 		_isWaitingAnimation = false;
 
 		_speed = Vector3.zero;
@@ -121,6 +143,8 @@ public class ActorController : MonoBehaviour {
 		//_isForward = true;
 
 		_animation = Ani_Idle;
+
+		_stopTimer = -1;
 	}
 	
 	// Update is called once per frame
@@ -132,12 +156,16 @@ public class ActorController : MonoBehaviour {
 		bool isHeadHit;
 		bool isSlideDown;
 		bool isMoveForward;
+		bool isStopElement;
 		int detectDir;
 
 		float deltaTime = Time.fixedDeltaTime;
 		if (deltaTime > 0.02f) {
 			deltaTime = 0.02f;
 		}
+
+		// 判断和关卡中的运动物体关系
+		CheckActiveElements();
 
 		Vector3 pos;
 		pos = transform.position;
@@ -146,16 +174,24 @@ public class ActorController : MonoBehaviour {
 
 		isMoveForward = _speed.x > 0;
 
-		// Test data
-		/*{
-			pos.x = 9.4016f;
-			pos.y = -7.935f;
-			_speed.x = 6.3f;
-			_speed.y = -14.4f;
-			_status = 6;
-			isMoveForward = true;
-		}*/
+		if(_status!=Status_GameOver) {
+			detectElement = GetFootMapElement (pos);
+			if (detectElement != null) {
+				if ((detectElement.type == MapElement.Type_End) || (detectElement.type == MapElement.Type_EndFollow)) {
+					SetGameOver (true);
+					return;
+				}
+			}
 
+			if (_gameMap.IsDeadMapPoint (_gameMap.GetMapPointOfWorldPosition (pos)) == true) {
+				SetGameOver (false);
+				return;
+			}
+		}
+
+		if (_magnetTimer > 0) {
+			_magnetTimer -= deltaTime;
+		}
 
 		switch (_status) {
 		case Status_Run:
@@ -166,6 +202,10 @@ public class ActorController : MonoBehaviour {
 				} else {
 					break;
 				}
+			}
+
+			if (_stopTimer > 0) {
+				_stopTimer -= deltaTime;
 			}
 
 			if (isMoveForward == true) {
@@ -242,8 +282,7 @@ public class ActorController : MonoBehaviour {
 					if (isMoveForward) {
 						_speed.x *= 1.1f;
 						_speed.y = -1 * Mathf.Abs (_speed.x / 2);
-					}
-					else {
+					} else {
 						_speed.x *= 0.9f;
 						_speed.y = -1 * Mathf.Abs (_speed.x / 2);
 					}
@@ -257,8 +296,7 @@ public class ActorController : MonoBehaviour {
 					if (isMoveForward) {
 						_speed.x *= 1.2f;
 						_speed.y = -1 * _speed.x;
-					}
-					else {
+					} else {
 						_speed.x *= 0.75f;
 						_speed.y = -1 * _speed.x;
 					}
@@ -267,8 +305,7 @@ public class ActorController : MonoBehaviour {
 					SetStatus (Status_RunSlope04);
 					isSlopeBelow = true;
 					Debug.LogWarning ("Run slope 04: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
-				}
-				else if ((detectElement.type == MapElement.Type_WallSlope01)||(detectElement.type == MapElement.Type_WallSlope01Follow)) {
+				} else if ((detectElement.type == MapElement.Type_WallSlope01) || (detectElement.type == MapElement.Type_WallSlope01Follow)) {
 					_speed = GetDefaultSpeed ();
 					if (isMoveForward) {
 						_speed.x *= 1.1f;
@@ -282,14 +319,12 @@ public class ActorController : MonoBehaviour {
 					SetStatus (Status_RunSlope02);
 					isSlopeBelow = true;
 					Debug.LogWarning ("Run slope 01: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
-				}
-				else if (detectElement.type == MapElement.Type_WallSlope02) {
+				} else if (detectElement.type == MapElement.Type_WallSlope02) {
 					_speed = GetDefaultSpeed ();
 					if (isMoveForward) {
 						_speed.x *= 1.2f;
 						_speed.y = _speed.x;
-					}
-					else {
+					} else {
 						_speed.x *= 0.75f;
 						_speed.y = _speed.x;
 					}
@@ -298,6 +333,12 @@ public class ActorController : MonoBehaviour {
 					SetStatus (Status_RunSlope02);
 					isSlopeBelow = true;
 					Debug.LogWarning ("Run slope 02: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+				} else if (detectElement.type == MapElement.Type_Stop) {
+					if (_stopTimer < 0) {
+						// 判断是不是踩到了停止
+						_stopElement = (MapElementStop)detectElement;
+						pos = SetStop ();
+					}
 				}
 
 			}
@@ -373,7 +414,7 @@ public class ActorController : MonoBehaviour {
 				case  MapElement.Block_None:
 					break;
 				case  MapElement.Block_Soft:
-					detectElement.HitBottom ();
+					detectElement.HitBottom (_speed.x>0);
 					_timer = ActorJumpUpTopDuration;
 					_targetY = pos.y + ActorJumpUpTopHeight;
 					_jumpUpTopRate = 1.0f;
@@ -428,12 +469,16 @@ public class ActorController : MonoBehaviour {
 					if (detectElement.IsBlock (detectDir) != MapElement.Block_None) {
 						// 判断脚下是不是正好是斜坡，在斜坡起跳有时候会撞到前面斜坡下的墙，所以是的话忽略前面的障碍
 						detectElement = GetFootMapElement (pos);
-						if ((detectElement.type == MapElement.Type_WallSlope01) || (detectElement.type == MapElement.Type_WallSlope01Follow)
-						    || (detectElement.type == MapElement.Type_WallSlope02)
-						    || (detectElement.type == MapElement.Type_WallSlope03) || (detectElement.type == MapElement.Type_WallSlope03Follow)
-						    || (detectElement.type == MapElement.Type_WallSlope04)) {
-
-						} else {
+						isSlopeBelow = false;
+						if (detectElement != null) {
+							if ((detectElement.type == MapElement.Type_WallSlope01) || (detectElement.type == MapElement.Type_WallSlope01Follow)
+							    || (detectElement.type == MapElement.Type_WallSlope02)
+							    || (detectElement.type == MapElement.Type_WallSlope03) || (detectElement.type == MapElement.Type_WallSlope03Follow)
+							    || (detectElement.type == MapElement.Type_WallSlope04)) {
+								isSlopeBelow = true;
+							}
+						}
+						if(isSlopeBelow==false) {
 							// 下边沿被堵住了
 							// 判断主角是不是超过对面障碍半个身高，是的话可以越过
 							if (pos.y - (int)pos.y > 0.5f) {
@@ -458,8 +503,7 @@ public class ActorController : MonoBehaviour {
 			isMoveForward = GetDefaultSpeed ().x > 0;
 			if (isMoveForward == true) {
 				detectDir = MapElement.Dir_Left;
-			}
-			else {
+			} else {
 				detectDir = MapElement.Dir_Right;
 			}
 			// 前面有阻碍，向上跳起
@@ -472,6 +516,7 @@ public class ActorController : MonoBehaviour {
 				}
 			}
 
+			isSlideDown = false;
 			_timer -= deltaTime;
 			if (_timer <= 0) {
 				//SetStatus (Status_FallDown);
@@ -481,53 +526,41 @@ public class ActorController : MonoBehaviour {
 				Debug.LogWarning ("JumpupBlocked to Slide: Speed:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
 			}
 
-			isHeadHit = false;
+			if(isSlideDown==false) {
+				isHeadHit = false;
 
-			// 判断头上是不是顶到了东西
-			detectElement = GetHeadTopMapElement (pos);
-			if (detectElement != null) {
-				switch (detectElement.IsBlock (MapElement.Dir_Down)) {
-				case  MapElement.Block_None:
-					break;
-				case  MapElement.Block_Soft:
-					detectElement.HitBottom ();
-					_timer = ActorJumpUpTopDuration;
-					_targetY = pos.y + ActorJumpUpTopHeight;
-					_jumpUpTopRate = 1.0f;
-					pos.y = CalculateJumpUpTopHeight (_timer);
-					SetStatus (Status_JumpHitTop);
-					SetAnimation (Ani_JumpHitTop);
-					isHeadHit = true;
-					Debug.LogWarning ("JumpupBlocked Hit top soft: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
-					break;
-				case  MapElement.Block_Hard:
-					pos.y = Mathf.Round (pos.y);
-					_speed.y = -1 * ActorJumpUpSpeedY * ActorJumpUpFallSpeedRate;
-					SetStatus (Status_FallDown);
-					SetAnimation (Ani_FallDown);
-					isHeadHit = true;
-					Debug.LogWarning ("JumpupBlocked Hit top hard: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
-					break;
-				}
-			}
-
-			if (isHeadHit == false) {
-				// 判断前面是不是空了
-				detectElement = GetFrontFootMapElement (pos, isMoveForward);
-
-				isEmpty = false;
-				if (detectElement == null) {
-					isEmpty = true;
-				}
+				// 判断头上是不是顶到了东西
+				detectElement = GetHeadTopMapElement (pos);
 				if (detectElement != null) {
-					if (detectElement.IsBlock (detectDir) == MapElement.Block_None) {
-						isEmpty = true;
+					switch (detectElement.IsBlock (MapElement.Dir_Down)) {
+					case  MapElement.Block_None:
+						break;
+					case  MapElement.Block_Soft:
+						detectElement.HitBottom (_speed.x>0);
+						_timer = ActorJumpUpTopDuration;
+						_targetY = pos.y + ActorJumpUpTopHeight;
+						_jumpUpTopRate = 1.0f;
+						pos.y = CalculateJumpUpTopHeight (_timer);
+						SetStatus (Status_JumpHitTop);
+						SetAnimation (Ani_JumpHitTop);
+						isHeadHit = true;
+						Debug.LogWarning ("JumpupBlocked Hit top soft: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+						break;
+					case  MapElement.Block_Hard:
+						pos.y = Mathf.Round (pos.y);
+						_speed.y = -1 * ActorJumpUpSpeedY * ActorJumpUpFallSpeedRate;
+						SetStatus (Status_FallDown);
+						SetAnimation (Ani_FallDown);
+						isHeadHit = true;
+						Debug.LogWarning ("JumpupBlocked Hit top hard: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+						break;
 					}
 				}
 
-				if (isEmpty == true) {
-					//  判断头上前面是不是空的
-					detectElement = GetFrontTopMapElement (pos, isMoveForward);
+				if (isHeadHit == false) {
+					// 判断前面是不是空了
+					detectElement = GetFrontFootMapElement (pos, isMoveForward);
+
 					isEmpty = false;
 					if (detectElement == null) {
 						isEmpty = true;
@@ -537,13 +570,28 @@ public class ActorController : MonoBehaviour {
 							isEmpty = true;
 						}
 					}
-					if (isEmpty) {
-						_speed = GetDefaultSpeed ();
-						_speed.y = ActorJumpUpSpeedY;
-						pos.y = (int)(pos.y + 0.5f);
-						SetStatus (Status_JumpUp);
-						SetAnimation (Ani_JumpUp);
-						Debug.LogWarning ("JumpupBlocked to jumpup: Speed:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+
+					if (isEmpty == true) {
+						//  判断头上前面是不是空的
+						detectElement = GetFrontTopMapElement (pos, isMoveForward);
+						isEmpty = false;
+						if (detectElement == null) {
+							isEmpty = true;
+						}
+						if (detectElement != null) {
+							if (detectElement.IsBlock (detectDir) == MapElement.Block_None) {
+								isEmpty = true;
+							}
+						}
+						if (isEmpty) {
+							_speed = GetDefaultSpeed ();
+							_speed.x /= 3;
+							_speed.y = ActorJumpUpSpeedY;
+							pos.y = (int)(pos.y + 0.5f);
+							SetStatus (Status_JumpUp);
+							SetAnimation (Ani_JumpUp);
+							Debug.LogWarning ("JumpupBlocked to jumpup: Speed:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+						}
 					}
 				}
 			}
@@ -577,6 +625,36 @@ public class ActorController : MonoBehaviour {
 				}
 			}
 
+			// 判断有没有踩在Stop上面
+		    isStopElement = false;
+			if (detectElement != null) {
+				if (detectElement.type == MapElement.Type_Stop) {
+					_stopElement = (MapElementStop)detectElement;
+					isStopElement = true;
+				} else {
+					detectElement = GetFootFrontMapElement (pos, isMoveForward);
+					if (detectElement != null) {
+						if (detectElement.type == MapElement.Type_Stop) {
+							_stopElement = (MapElementStop)detectElement;
+							isStopElement = true;
+						} else {
+							detectElement = GetFootFrontMapElement (pos, !isMoveForward);
+							if (detectElement != null) {
+								if (detectElement.type == MapElement.Type_Stop) {
+									_stopElement = (MapElementStop)detectElement;
+									isStopElement = true;
+								}
+							}
+						}
+					}
+				}
+			}
+			if (isStopElement == true) {
+				pos = SetStop ();
+				isGroundBelow = true;
+				break;
+			}
+
 			// 判断头上是不是顶到了东西
 			detectElement = GetHeadTopMapElement (pos);
 			if (detectElement != null) {
@@ -584,7 +662,7 @@ public class ActorController : MonoBehaviour {
 				case  MapElement.Block_None:
 					break;
 				case  MapElement.Block_Soft:
-					detectElement.HitBottom ();
+					detectElement.HitBottom (_speed.x>0);
 					pos.y = CalculateJumpUpTopHeight (_timer);
 					SetStatus (Status_JumpHitTop);
 					SetAnimation (Ani_JumpHitTop);
@@ -731,6 +809,36 @@ public class ActorController : MonoBehaviour {
 				}
 			}
 
+			if( isSlopeBelow==false ) {
+				// 判断有没有踩在Stop上面
+			    isStopElement = false;
+				if (detectElement != null) {
+					if (detectElement.type == MapElement.Type_Stop) {
+						_stopElement = (MapElementStop)detectElement;
+						isStopElement = true;
+					} else {
+						detectElement = GetFootFrontMapElement (pos, isMoveForward);
+						if (detectElement != null) {
+							if (detectElement.type == MapElement.Type_Stop) {
+								_stopElement = (MapElementStop)detectElement;
+								isStopElement = true;
+							} else {
+								detectElement = GetFootFrontMapElement (pos, !isMoveForward);
+								if (detectElement != null) {
+									if (detectElement.type == MapElement.Type_Stop) {
+										_stopElement = (MapElementStop)detectElement;
+										isStopElement = true;
+									}
+								}
+							}
+						}
+					}
+				}
+				if (isStopElement == true) {
+					pos = SetStop ();
+					break;
+				}
+			}
 
 
 			if (isGroundBelow == false) {
@@ -1178,17 +1286,195 @@ public class ActorController : MonoBehaviour {
 				}
 			}
 			break;
+
+		case Status_SpringUp:
+			if (isMoveForward == true) {
+				detectDir = MapElement.Dir_Left;
+			} else {
+				detectDir = MapElement.Dir_Right;
+			}
+
+			// 判断头上是不是顶到了东西
+			detectElement = GetHeadTopMapElement (pos);
+			if (detectElement != null) {
+				switch (detectElement.IsBlock (MapElement.Dir_Down)) {
+				case  MapElement.Block_None:
+					break;
+				case  MapElement.Block_Soft:
+					detectElement.HitBottom (_speed.x > 0);
+					_timer = ActorJumpUpTopDuration;
+					_targetY = pos.y + ActorJumpUpTopHeight;
+					_jumpUpTopRate = 1.0f;
+					pos.y = CalculateJumpUpTopHeight (_timer);
+					SetStatus (Status_JumpHitTop);
+					SetAnimation (Ani_JumpHitTop);
+					Debug.LogWarning ("Jumpup Hit top hard: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+					break;
+				case  MapElement.Block_Hard:
+					pos.y = Mathf.Round (pos.y);
+					_speed.y = -1 * ActorJumpUpSpeedY * ActorJumpUpFallSpeedRate;
+					SetStatus (Status_FallDown);
+					SetAnimation (Ani_FallDown);
+					Debug.LogWarning ("Jumpup Hit top hard: SpeedY:" + _speed.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+					break;
+				}
+			}
+
+			detectElement = GetFrontMapElement (pos, isMoveForward);
+			bool isFrontBlocked = false;
+			if (detectElement != null) {
+				if (detectElement.IsBlock (detectDir) != MapElement.Block_None) {
+					isFrontBlocked = true;
+				}	
+			}
+
+			if (isFrontBlocked == false) {
+				detectElement = GetFrontHeadMapElement (pos, isMoveForward);
+				if (detectElement != null) {
+					if (detectElement.IsBlock (detectDir) != MapElement.Block_None) {
+						isFrontBlocked = true;
+						break;
+					}	
+				}
+			}
+
+			if (isFrontBlocked == false) {
+				detectElement = GetFrontBottomMapElement (pos, isMoveForward);
+				if (detectElement != null) {
+					if (detectElement.IsBlock (detectDir) != MapElement.Block_None) {
+						isFrontBlocked = true;
+						break;
+					}	
+				}
+			}
+
+			if (isFrontBlocked == true) {
+				// 前面的方块不能进入，被堵住了
+				pos.x = detectElement.transform.position.x + Mathf.Sign (_speed.x) * (0.5f + _width / 2);
+				_speed.x = 0;
+			}
+			
+			_speed.y += Gravity * deltaTime;
+			if (_speed.y < 0) {
+				_jumpUpTopRate = 1.0f;
+				SetStatus (Status_JumpTop);
+				SetAnimation (Ani_JumpTop);
+				_speed.x = GetDefaultSpeed ().x;
+				_timer = ActorJumpUpTopDuration * _jumpUpTopRate;
+				_targetY = pos.y + ActorJumpUpTopHeight * _jumpUpTopRate;
+				pos.y = CalculateJumpUpTopHeight (_timer);
+
+				Debug.LogWarning ("SpringUp to JumpTop: _targetY:" + _targetY.ToString () + "PosX:" + pos.x.ToString () + " PosY:" + pos.y.ToString ());
+			}
+			break;
 		}
+
+
 
 		Debug.Log ("Update Out - Status" + _status.ToString () + "  Time:" + _timer.ToString () + " x:" + pos.x.ToString ()+ " y:" + pos.y.ToString () +"  Speed-x:"+_speed.x+" y:"+_speed.y );
 		transform.position = pos;
 
-		if (pos.y < -10.05) {
-			int test = 0;
-			test++;
-		}
-
 		_gameMap.SetCameraPosition ();
+
+
+	}
+
+	void SetGameOver(bool isWin) {
+		if (_status == Status_GameOver) {
+			return;
+		}
+		SetStatus (Status_GameOver);
+		_speed = Vector3.zero;
+		_gameMap.GameOver ( transform.position, isWin );
+	}
+
+	Rect GetCollisionRect() {
+		return new Rect (transform.position.x-_width/2,transform.position.y-_height/2+0.3f,_width,_height);
+	}
+
+	void CheckActiveElements() {
+		List<ActiveElement> activeElements = _gameMap.GetActiveElementList ();
+		ActiveElement element;
+		ActiveMoveElement activeMoveElement;
+		Rect actorRect = GetCollisionRect ();
+
+		for (int m = 0; m < activeElements.Count; m++) {
+			element = activeElements [m];
+
+			if (element.IsCollised (actorRect)) {
+				if (element.IsEnemy () == false) {
+					// 不是敌人，直接触发
+					element.DoCollised ();
+				} else if (element is EnemyMoveElement) {
+					// 判断是不是踩上去
+					bool isDead = true;
+					if ((_status == Status_FallDown)
+					    || (_status == Status_SlideDownFront) || (_status == Status_SlideDownBack)
+					    || ((_status == Status_RunSlope02) && (_speed.x < 0))
+					    || ((_status == Status_RunSlope04) && (_speed.x > 0))) {
+						if (transform.position.y > element.transform.position.y) {
+							EnemyMoveElement enemy = (EnemyMoveElement)element;
+							isDead = enemy.JumpOnHead ();
+							if (isDead == false) {
+								// 如果已经按下了跳
+								if (_jumpUpPressed) {
+									DoKeyPressed (true);
+								} else {
+									// 只是弹起来
+									_jumpUpTimer = 0;
+									_timer = ActorBounceUpDuration;
+									_speed.y = ActorJumpUpSpeedY;
+									_jumpUpPressed = true;
+									SetStatus (Status_JumpUp);
+									SetAnimation (Ani_JumpUp);
+									_jumpUpPressTreated = true;
+								}
+							}
+						} 
+					}
+
+					if (isDead) {
+						element.DoCollised ();
+						SetGameOver (false);
+
+						return;
+					}
+				} else {
+					element.DoCollised ();
+					SetGameOver (false);
+
+					return;
+				}
+			}
+
+			if (element.IsActive () == false) {
+				// 这个元素还没有激活
+				if (_speed.x > 0) {
+					// 主角在往右跑
+					if ((element.x <= _gameMap.RightBorder + 1) && (element.y >= _gameMap.TopBorder) && (element.y <= _gameMap.BottomBorder) && (element.GetTriggerDirection () == MapElement.Dir_Left)) {
+						element.SetActive ();
+					}
+				} else if (_speed.x < 0) {
+					// 主角在往右跑
+					if ((element.x >= _gameMap.LeftBorder - 1) && (element.y >= _gameMap.TopBorder) && (element.y <= _gameMap.BottomBorder) && (element.GetTriggerDirection () == MapElement.Dir_Right)) {
+						element.SetActive ();
+					}
+				}
+				if (_speed.y > 0) {
+					if ((element.y >= _gameMap.TopBorder - 1) && (element.x >= _gameMap.LeftBorder) && (element.x <= _gameMap.RightBorder) && (element.GetTriggerDirection () == MapElement.Dir_Up)) {
+						element.SetActive ();
+					}
+				} else if (_speed.y < 0) {
+					if ((element.y <= _gameMap.BottomBorder + 1) && (element.x >= _gameMap.LeftBorder) && (element.x <= _gameMap.RightBorder) && (element.GetTriggerDirection () == MapElement.Dir_Down)) {
+						element.SetActive ();
+					}
+				}
+			} else if (_magnetTimer>0) {
+				if (Vector2.Distance (transform.position, element.transform.position) < 4) {
+					element.FlyToActor ();
+				}
+			}
+		}
 	}
 
 	Vector3 SetJumpToRun( Vector3 pos ) {
@@ -1201,7 +1487,7 @@ public class ActorController : MonoBehaviour {
 			_timer = -1;
 			_speed = GetDefaultSpeed ();
 		}
-		pos.y = Mathf.Round(pos.y + 0.5f);
+		pos.y = Mathf.Round(pos.y-DetectAdvanceSpaceY + 0.5f);
 		SetStatus (Status_Run);
 		SetAnimation (Ani_Run);
 
@@ -1287,6 +1573,19 @@ public class ActorController : MonoBehaviour {
 		}
 		SetAnimation (Ani_RunSlope04);
 		SetStatus (Status_RunSlope04);
+	}
+
+	Vector3 SetStop(  ) {
+		bool isForward = GetDefaultSpeed ().x > 0;
+		_stopElement.SetRunForward (isForward);
+
+		_speed = Vector3.zero;
+		SetAnimation (Ani_Stop);
+		SetStatus (Status_Stop);
+
+		Vector3 result = _gameMap.GetWorldPositionByMapPoint (_stopElement.x, _stopElement.y);
+		result.y += 1;
+		return result;
 	}
 
 	MapElement GetHeadTopMapElement(Vector3 pos) {
@@ -1387,6 +1686,14 @@ public class ActorController : MonoBehaviour {
 		return _gameMap.GetMapElementByMapPoint (detectMapPoint.x, detectMapPoint.y);
 	}
 
+	MapElement GetFootBottomDownMapElement(Vector3 pos) {
+		Vector3 detectPos = pos;
+		detectPos.y -= 1.0f;
+
+		MapPoint detectMapPoint = _gameMap.GetMapPointOfWorldPosition (detectPos);
+		return _gameMap.GetMapElementByMapPoint (detectMapPoint.x, detectMapPoint.y);
+	}
+
 	MapElement GetFootMapElement( Vector3 pos ) {
 		Vector3 detectPos = pos;
 		float angle = transform.localEulerAngles.z*3.1415927f/180;
@@ -1466,6 +1773,8 @@ public class ActorController : MonoBehaviour {
 
 	public void StartGame() {
 		_speed.x = ActorSpeedX;
+		_magnetTimer = -1;
+
 		SetStatus( Status_Run );
 		SetAnimation (Ani_Run);
 	}
@@ -1486,6 +1795,28 @@ public class ActorController : MonoBehaviour {
 			if (_jumpUpPressTreated == false) {
 				switch (_status) {
 				case Status_Run:
+					{
+						MapElement detectElement = GetFootBottomDownMapElement (transform.position);
+						if (detectElement != null) {
+							if ((detectElement.type == MapElement.Type_Spring) || (detectElement.type == MapElement.Type_SpringFollow)) {
+								SetStatus (Status_SpringUp);
+								_timer = ActorJumpUpDuration+ActorJumpUpPressDuration+ActorJumpUpDuration;
+								_speed.y = ActorJumpUpSpeedY*2;
+								Gravity = -50;
+								_speed.x *= 1 / 3;
+								break;
+							}
+						}
+						_jumpUpTimer = ActorJumpUpPressDuration;
+						_timer = ActorJumpUpDuration;
+						_speed.y = ActorJumpUpSpeedY;
+						_jumpUpPressed = true;
+						SetStatus (Status_JumpUp);
+						SetAnimation (Ani_JumpUp);
+						_jumpUpPressTreated = true;
+						Debug.LogWarning ("Key Pressed: Jump Up");
+						break;
+					}
 				case Status_RunSlope01:
 				case Status_RunSlope03:
 				case Status_RunSlope04:
@@ -1500,16 +1831,28 @@ public class ActorController : MonoBehaviour {
 					Debug.LogWarning ("Key Pressed: Jump Up");
 					break;
 				case Status_Blocked:
-					_jumpUpTimer = ActorJumpUpPressDuration;
-					_timer = ActorJumpUpDuration;
-					_speed.y = ActorJumpUpSpeedY;
-					_speed.x = 0;
-					_jumpUpPressed = true;
-					SetStatus (Status_JumpupBlocked);
-					SetAnimation (Ani_JumpupBlocked);
-					Debug.LogWarning ("Key Pressed: Jump Up Blocked");
-					_jumpUpPressTreated = true;
-					break;
+					{
+						MapElement detectElement = GetFootBottomDownMapElement (transform.position);
+						if (detectElement != null) {
+							if ((detectElement.type == MapElement.Type_Spring) || (detectElement.type == MapElement.Type_SpringFollow)) {
+								SetStatus (Status_SpringUp);
+								_speed.y = ActorJumpUpSpeedY*2;
+								Gravity = -50;
+								_speed.x *= 1 / 3;
+								break;
+							}
+						}
+						_jumpUpTimer = ActorJumpUpPressDuration;
+						_timer = ActorJumpUpDuration;
+						_speed.y = ActorJumpUpSpeedY;
+						_speed.x = 0;
+						_jumpUpPressed = true;
+						SetStatus (Status_JumpupBlocked);
+						SetAnimation (Ani_JumpupBlocked);
+						Debug.LogWarning ("Key Pressed: Jump Up Blocked");
+						_jumpUpPressTreated = true;
+						break;
+					}
 				case Status_SlideDownFront:
 					_jumpUpTimer = ActorJumpUpPressDuration;
 					_timer = ActorJumpUpDuration;
@@ -1531,6 +1874,28 @@ public class ActorController : MonoBehaviour {
 					SetAnimation (Ani_JumpUp);
 					Debug.LogWarning ("Key Pressed: Jump Up forward");
 					_jumpUpPressTreated = true;
+					break;
+				case Status_Stop:
+					if (_stopElement.GetSubtype () == MapElementStop.StopType_Direct) {
+						_stopTimer = 0.15f;
+						_speed = GetDefaultSpeed ();
+						SetStatus (Status_Run);
+						SetAnimation (Ani_Run);
+						_jumpUpPressTreated = true;
+						Debug.LogWarning ("Key Pressed: run from stop");
+						_stopElement.ReleaseFromStop ();
+					} else {
+						_jumpUpTimer = ActorJumpUpPressDuration;
+						_timer = ActorJumpUpDuration;
+						_speed = GetDefaultSpeed ();
+						_speed.y = ActorJumpUpSpeedY;
+						_jumpUpPressed = true;
+						SetStatus (Status_JumpUp);
+						SetAnimation (Ani_JumpUp);
+						_jumpUpPressTreated = true;
+						Debug.LogWarning ("Key Pressed: Jump Up from stop");
+						_stopElement.ReleaseFromStop ();
+					}
 					break;
 				default:
 					_jumpUpPressed = true;
@@ -1635,5 +2000,9 @@ public class ActorController : MonoBehaviour {
 		}
 
 		return new Vector3 (Mathf.Sign(_speed.x) * ActorSpeedX, 0, 0);
+	}
+
+	public void SetMagnet() {
+		_magnetTimer = 8;
 	}
 }

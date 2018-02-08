@@ -52,10 +52,18 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Demigiant\DOTweenPro\DOTweenAnimation.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\ActiveElement.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\ActiveMoveElement.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\BounceAward.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\CoinArrowElement.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\CoinEject.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\CoinElement.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\Enemy\EnemyMoveElement.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\Enemy\EnemyMushroom.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\Enemy\EnemyPiranha.cs" />
+     <Compile Include="Assets\Scripts\ActiveElements\Mushroom.cs" />
      <Compile Include="Assets\Scripts\ActorController.cs" />
      <Compile Include="Assets\Scripts\CreateLevels.cs" />
-     <Compile Include="Assets\Scripts\Enemy\EnemyBase.cs" />
-     <Compile Include="Assets\Scripts\Enemy\EnemyMushroom.cs" />
      <Compile Include="Assets\Scripts\GameController.cs" />
      <Compile Include="Assets\Scripts\GameMap.cs" />
      <Compile Include="Assets\Scripts\LevelDef.cs" />
@@ -63,12 +71,17 @@
      <Compile Include="Assets\Scripts\MapElements\MapElementBrick.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementCloud.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementCoin.cs" />
-     <Compile Include="Assets\Scripts\MapElements\MapElementCoinArrow.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementEnd.cs" />
+     <Compile Include="Assets\Scripts\MapElements\MapElementEndFollow.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementPillar.cs" />
+     <Compile Include="Assets\Scripts\MapElements\MapElementPiranhaFollow.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementQuestionBlock.cs" />
+     <Compile Include="Assets\Scripts\MapElements\MapElementSpring.cs" />
+     <Compile Include="Assets\Scripts\MapElements\MapElementSpringFollow.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementStop.cs" />
+     <Compile Include="Assets\Scripts\MapElements\MapElementWallBoard.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementWallFixed.cs" />
+     <Compile Include="Assets\Scripts\MapElements\MapElementWallSlopeBottom.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementWallSlopeDown01.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementWallSlopeDown01Follow.cs" />
      <Compile Include="Assets\Scripts\MapElements\MapElementWallSlopeDown02.cs" />
