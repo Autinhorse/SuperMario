@@ -2,24 +2,24 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/CreateLevels.cs">
     <Files>
+      <File FileName="Assets/Scripts/GameMap.cs" Line="1063" Column="15" />
       <File FileName="Assets/Scripts/ActorController.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/LevelDef.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ActiveElements/CoinEject.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ActiveElements/BounceAward.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/MapElements/MapElement.cs" Line="42" Column="39" />
+      <File FileName="Assets/Scripts/MapElements/MapElement.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ActiveElements/ActiveElement.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ActiveElements/ActiveMoveElement.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/MapElements/MapElementPiranhaFollow.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/MapElements/MapElementSpringFollow.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/GameMap.cs" Line="728" Column="6" />
-      <File FileName="Assets/Scripts/CreateLevels.cs" Line="718" Column="3" />
+      <File FileName="Assets/Scripts/CreateLevels.cs" Line="934" Column="71" />
       <File FileName="Assets/Scripts/ActiveElements/Mushroom.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ActiveElements/Enemy/EnemyMushroom.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ActiveElements/Enemy/EnemyMoveElement.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/ActiveElements/Enemy/EnemyPiranha.cs" Line="1" Column="1" />
       <File FileName="Assets/Scripts/MapElements/MapElementStop.cs" Line="1" Column="1" />
-      <File FileName="Assets/Scripts/MapElements/MapElementWallBoard.cs" Line="22" Column="20" />
-      <File FileName="Assets/Scripts/MapElements/MapElementWallFixed.cs" Line="23" Column="3" />
+      <File FileName="Assets/Scripts/MapElements/MapElementWallBoard.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/MapElements/MapElementWallFixed.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
@@ -37,7 +37,7 @@
       <Breakpoint file="/Users/xiaoyuma/Documents/My_Works/SuperMario/SuperMario/Assets/Scripts/GameMap.cs" line="388" column="34" />
       <Breakpoint file="/Users/xiaoyuma/Documents/My_Works/SuperMario/SuperMario/Assets/Scripts/GameMap.cs" line="352" column="1" />
       <Breakpoint file="/Users/xiaoyuma/Documents/My_Works/SuperMario/SuperMario/Assets/Scripts/GameMap.cs" line="355" column="24" />
-      <Breakpoint file="/Users/xiaoyuma/Documents/My_Works/SuperMario/SuperMario/Assets/Scripts/CreateLevels.cs" line="441" column="1" />
+      <Breakpoint file="/Users/xiaoyuma/Documents/My_Works/SuperMario/SuperMario/Assets/Scripts/GameMap.cs" line="1063" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

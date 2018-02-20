@@ -7,14 +7,17 @@ public class CreateLevels  {
 	List<LevelDef> _localLevels;
 
 	public LevelDef GetLevelDef( int index ) {
-		return _localLevels[0];
+		return _localLevels[index];
+	}
+
+	public int GetLevelDefNumber() {
+		return _localLevels.Count;
 	}
 
 	public CreateLevels() {
 		_localLevels = new List<LevelDef> ();
 
-		// ************* 创建第一关 **************************************************************
-		LevelDef levelDef = new LevelDef ();
+		LevelDef levelDef;
 		LevelSegment segment;
 		LevelElementQuestion elementQuestion;
 		LevelElementPillar elementPillar;
@@ -22,10 +25,13 @@ public class CreateLevels  {
 		LevelElementStop elementStop;
 		LevelElementEnemyMushroon enemyMushroom;
 
+		// ************* 创建第一关 **************************************************************
+		levelDef = new LevelDef ();
+
 
 		// ************* 第一段 ********************************
-		/*
-		LevelSegment segment = new LevelSegment();
+
+	    segment = new LevelSegment();
 
 		string[] segametData01 = {
 			// 0
@@ -39,38 +45,38 @@ public class CreateLevels  {
 			// 5
 		   //0        10	    20        30        40        50		60
 			"0000000000000000000000000000000000000000000000000000000000000",
+			"0000010011001101100110000001000000000000000000000000000000000",
+			"0111011011011101110110111011000000000000000000000000000000000",
+			"0110011001000000000100011011000000000000000000000000000000000",
 			"0000000000000000000000000000000000000000000000000000000000000",
-			"0000000000000000000000000000000000000000000000000000000000000",
-			"0100000000000000000000000000000000000000000000000000000000000",
-			"0100000000000000000000000000000000000000000000000000000000000",
 		   //0        10	    20        30        40        50		60
 			// 10
 		   //0        10	    20        30        40        50		60
-			"0100000000000000000000000000000000000000000000000000000000001",
-			"0100000000000000000000000000000000000000000000000000000000001",
-			"0100000000000000000000000000000000000000000000000000000000001",
-			"0100000000000000000000000000000000000000000000000000000000001",
-			"0100000000000000000000000000000000000000000000000000000000001",
+			"0110011000110000001010001000000000000000000000000000000000001",
+			"0111011101110111011011011100000000000000000000000000000000001",
+			"0110001101100010001010000000000000000000000000000000000000001",
+			"0000000000000000000000000000000000000000000000000000000000001",
+			"0010001101110010001000110000000000000000000000000000000000001",
 		   //0        10	    20        30        40        50		60
 			// 15
 		   //0        10	    20        30        40        50		60
-			"0100000000000000000000000000000000000000000000000000000000001",
-			"0100000000000000000000000000000000000000000000000000000000001",
-			"0100000000000000000000000001111111000000000000000000000000001",
-			"0100000000000000000000000001000000000000000000000000000000001",
-			"0100000000000000000000000001099999990000000000000000000000001",
+			"0111011101110111011101110000000000000000000000000000000000001",
+			"0111001100100110001100100000000000000000000000000000000000001",
+			"0000000000000000000000000001111111000000000000000000000000001",
+			"0011011001110111000000000001000000000000000000000000000000001",
+			"0111011101110111001001100001099999990000000000000000000000001",
 		   //0        10	    20        30        40        50		60
 			// 20
 		   //0        10	    20        30        40        50		60
-			"0100000000000000000000000001000000000000000000000000000000001",
-			"0100000000000000000000000001000000000000000000000000000000001",
-			"0100000000000000000000000001009000000000000000000000000000001",
+			"0111011101100011011101110001000000000000000000000000000000001",
+			"0000000000000000001000100001000000000000000000000000000000001",
+			"0000000000000000000000000001009000000000000000000000000000001",
 			"1111111111111111111111111HI1111111111111111111111111111111111",
 			"1111111111111111111111111001111111111111111111111111111111111",
 		   //0        10	    20        30        40        50		60
 			// 25
 		   //0        10	    20        30        40        50		60
-			"1111111111111111111111GGGG111111110001111111111111G1111111111",
+			"11111111111111111111111111111111110001111111111111G1111111111",
 			"1111111111111111111111111111111111000111111111111111110000111"
 		};
 		segment.data = segametData01;
@@ -88,7 +94,7 @@ public class CreateLevels  {
 		segment.lockScreenBottom = true;
 		segment.CalculateBorder ();
 
-		LevelElementQuestion elementQuestion = new LevelElementQuestion ( 10, 17, LevelElementQuestion.Type_AwardStar, LevelElementQuestion.Sprite_Question );
+		 elementQuestion = new LevelElementQuestion ( 10, 17, LevelElementQuestion.Type_AwardStar, LevelElementQuestion.Sprite_Question );
 		segment.elements.Add (elementQuestion);
 
 		elementQuestion = new LevelElementQuestion ( 18, 17, LevelElementQuestion.Type_AwardLife, LevelElementQuestion.Sprite_Question );
@@ -109,14 +115,14 @@ public class CreateLevels  {
 
 
 
-		LevelElementCoinArrow elementCoinArrow = new LevelElementCoinArrow ( 24, 21, MapElement.Dir_Right );
+		 elementCoinArrow = new LevelElementCoinArrow ( 24, 21, MapElement.Dir_Right );
 		segment.elements.Add (elementCoinArrow);
 
-		LevelElementPillar elementPillar = new LevelElementPillar ( 54, 19, MapElement.Dir_Up, 8 );
+		 elementPillar = new LevelElementPillar ( 54, 19, MapElement.Dir_Up, 8 );
 		//segment.elements.Add (elementPillar);
 
 
-		LevelElementEnemyMushroon enemyMushroom = new LevelElementEnemyMushroon (23, 20, MapElement.Dir_Left, MapElement.Dir_Left,0);
+		 enemyMushroom = new LevelElementEnemyMushroon (23, 20, MapElement.Dir_Left, MapElement.Dir_Left,0);
 		segment.elements.Add (enemyMushroom);
 
 		enemyMushroom = new LevelElementEnemyMushroon (25, 20, MapElement.Dir_Left, MapElement.Dir_Left,0);
@@ -138,9 +144,9 @@ public class CreateLevels  {
 		segment.elements.Add (enemyMushroom);
 
 		levelDef.segments.Add (segment);
-*/
+
 		// ************* 第一段 ********************************
-	    segment = new LevelSegment();
+/*	    segment = new LevelSegment();
 		string[] segametData01 = {
 		   // 0
 		   //0        10	    20        30        40        50		60
@@ -227,9 +233,9 @@ public class CreateLevels  {
 
 		enemyMushroom = new LevelElementEnemyMushroon (33, 18, MapElement.Dir_Left, MapElement.Dir_Left, 0);
 		segment.elements.Add (enemyMushroom);
-*/
-		levelDef.segments.Add (segment); 
 
+		levelDef.segments.Add (segment); 
+*/
 		// ************* 第二段 ********************************
 		segment = new LevelSegment();
 
@@ -714,6 +720,269 @@ public class CreateLevels  {
 		segment.elements.Add (enemyMushroom);
 
 
+		levelDef.segments.Add (segment);
+
+		_localLevels.Add (levelDef);
+
+
+
+
+		// ************* 创建第二关 **************************************************************
+		levelDef = new LevelDef ();
+
+		// ************* 第一段 ********************************
+		segment = new LevelSegment();
+		string[] segametData11 = {
+			// 0
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111",
+			"11111111111111110009000000000000000111111",
+			"11111111111111110090000000000000000111111",
+			"11111111111111110900000000000000000111111",
+		   //0        10	    20        30        40        50		60
+			// 5
+		   //0        10	    20        30        40        50		60
+			"11111111111111119000000000000000000111111",
+			"11111111111111110000000000000000009111111",
+			"11111111111111110000000000000000009111111",
+			"11111111111111110000000000000000009111111",
+			"11111111111111110000000000000000009111111",
+		   //0        10	    20        30        40        50		60
+			// 10
+		   //0        10	    20        30        40        50		60
+			"11111111111111110000111111111100009111111",
+			"11111111111111110000111111111100009111111",
+			"11111111111111119999111111111100009111111",
+			"11111111111111119999111111111100009111111",
+			"11111111111111119999111111111100000111111",
+	  	   //0        10	    20        30        40        50		60
+			// 15
+		   //0        10	    20        30        40        50		60
+			"11111111111111119999111111111100000000000",
+			"11111111111111119999111111111100000000000",
+			"11111111111111119999111111111100000000000",
+			"11111111111111119999111111111100000000000",
+			"11111111111111119999111111111100000000000",
+		   //0        10	    20        30        40        50		60
+			// 20
+		   //0        10	    20        30        40        50		60
+			"11111111111111119999111111111100000000000",
+			"11111111111111119999111111111100001111111",
+			"11111111111111110000111111111100001111111",
+			"11111111111111110000111111111100001111111",
+			"11111110000000000000111111111100001111111",
+		   //0        10	    20        30        40        50		60
+			// 25
+		   //0        10	    20        30        40        50		60
+			"11111110000000000000111111111100001111111",
+			"11111110009000000000000000000000001111111",
+			"11111110090000000000000000000000001111111",
+			"11111110900000000000000000000000001111111",
+			"11111119000111111111111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 30
+		   //0        10	    20        30        40        50		60
+			"11111110900111111111111111111111111111111",
+			"11111110090111111111111111111111111111111",
+			"11111110009111111111111111111111111111111",
+			"11111110000111111111111111111111111111111",
+			"00000000000111111111111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 35
+		   //0        10	    20        30        40        50		60
+			"00000000000111111111111111111111111111111",
+			"00000000000111111111111111111111111111111",
+			"11111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 35
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111111111"
+		};
+		segment.data = segametData11;
+
+		segment.width = segment.data[0].Length;
+		segment.height = segment.data.Length;
+
+		segment.segmentStartPos = new MapPoint (0, 22);
+		segment.startPoint = new MapPoint (2, 36);
+		segment.endPoint = new MapPoint (39, 20);
+
+		segment.lockScreenLeft = true;
+		segment.lockScreenRight = false;
+		segment.lockScreenTop = true;
+		segment.lockScreenBottom = true;
+		segment.CalculateBorder ();
+
+		elementCoinArrow = new LevelElementCoinArrow ( 29, 28, MapElement.Dir_RightUp );
+		segment.elements.Add (elementCoinArrow);
+
+		elementCoinArrow = new LevelElementCoinArrow ( 30, 21, MapElement.Dir_RightUp );
+		segment.elements.Add (elementCoinArrow);
+
+		enemyMushroom = new LevelElementEnemyMushroon (17, 28, MapElement.Dir_Left, MapElement.Dir_Left, 0);
+		segment.elements.Add (enemyMushroom);
+
+		enemyMushroom = new LevelElementEnemyMushroon (23, 28, MapElement.Dir_Left, MapElement.Dir_Left, 0);
+		segment.elements.Add (enemyMushroom);
+
+		enemyMushroom = new LevelElementEnemyMushroon (29, 28, MapElement.Dir_Left, MapElement.Dir_Left, 0);
+		segment.elements.Add (enemyMushroom);
+
+		/*
+		elementQuestion = new LevelElementQuestion ( 11, 19, LevelElementQuestion.Type_CoinOne, LevelElementQuestion.Sprite_Question );
+		segment.elements.Add (elementQuestion);
+
+		elementQuestion = new LevelElementQuestion ( 12, 19, LevelElementQuestion.Type_CoinOne, LevelElementQuestion.Sprite_Question );
+		segment.elements.Add (elementQuestion);
+
+		elementPillar = new LevelElementPillar ( 58, 20, MapElement.Dir_Up, 7 );
+		segment.elements.Add (elementPillar);
+
+		/*
+		elementCoinArrow = new LevelElementCoinArrow ( 24, 21, MapElement.Dir_LeftUp );
+		segment.elements.Add (elementCoinArrow);
+
+
+
+
+	    elementStop = new LevelElementStop ( 35, 21, MapElementStop.StopType_Direct );
+		segment.elements.Add (elementStop);
+
+
+
+		enemyMushroom = new LevelElementEnemyMushroon (33, 18, MapElement.Dir_Left, MapElement.Dir_Left, 0);
+		segment.elements.Add (enemyMushroom);
+*/
+		levelDef.segments.Add (segment); 
+
+		// ************* 第二段 ********************************
+		segment = new LevelSegment();
+		string[] segametData12 = {
+			// 0
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111100000000000000000000000000111",
+			"11111111111111111111111111111111111100000000000000000000000000111",
+			"11111111111111111111111111111111111100000000000000000000000000111",
+			"11111111111111111111111111111111111100000000000000000000000000111",
+			"11111111111111111111111111111111111100000000000000000000000000111",
+		   //0        10	    20        30        40        50		60
+			// 5
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111100000000111111111110000000111",
+			"11111111111111111111111111111111111100000000111111111110000000111",
+			"11111111111111111111111111111111111100000000111111111110000000111",
+			"11111111111111111111111111111111111100000000111111111110000000000",
+			"11111111111111111111111111111111111100000000111111111110000000000",
+		   //0        10	    20        30        40        50		60
+			// 10
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111111110000111111111110000000000",
+			"11111111111111111111111111111111111111110000111111111110000000000",
+			"11111111111111111111111111111111111111110000111111111110001111111",
+			"11111111111111111111111111111111111111110000111111111110001111111",
+			"11111111111111111111111111111111111111110000111111111110001111111",
+		   //0        10	    20        30        40        50		60
+			// 15
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111111110000111111111110001111111",
+			"11111111111111111111111111111111111111110000000000000000001111111",
+			"11111111111111111111111111111111111111110000000000000000001111111",
+			"11111111111111111111111111111111111111110000000000000000001111111",
+			"11111111111111111111111111111111111111110000111111111111HI1111111",
+		   //0        10	    20        30        40        50		60
+			// 20
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111111110000111111111111II1111111",
+			"11111111111111111111111111111111111111110000111111111111111111111",
+			"11111111111111111111111111111111111111110000111111111111111111111",
+			"11111111111111111111000000000000011111110000111111111111111111111",
+			"11111111111111111111000000000000000011110000111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 25
+		   //0        10	    20        30        40        50		60
+			"11111111111111100000000000000000000000000000111111111111111111111",
+			"11111111111111100000000000000000000000000000111111111111111111111",
+			"11111111111111100000000000000000000000000000111111111111111111111",
+			"11111111111111100000000000000000000000000000111111111111111111111",
+			"11111111100000000000000000000000000000000000111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 30
+		   //0        10	    20        30        40        50		60
+			"11111111100000000000000000000000000000000000111111111111111111111",
+			"11111111100000000000000000000000000000000000111111111111111111111",
+			"111111110000000000011111111111111111111111HI111111111111111111111",
+			"111111110000000000011111111111111111111111II111111111111111111111",
+			"11111111000000000001111111111111111111111111111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 35
+		   //0        10	    20        30        40        50		60
+			"11111000000000000001111111111111111111111111111111111111111111111",
+			"11111000000000000001111111111111111111111111111111111111111111111",
+			"11111000000000000001111111111111111111111111111111111111111111111",
+			"11111000000000000001111111111111111111111111111111111111111111111",
+			"00000000000000000001111111111111111111111111111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 35
+		   //0        10	    20        30        40        50		60
+			"00000000000000000001111111111111111111111111111111111111111111111",
+			"11111111111111111HI1111111111111111111111111111111111111111111111",
+			"11111111111111111II1111111111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111111111111111111111111111",
+		   //0        10	    20        30        40        50		60
+			// 35
+		   //0        10	    20        30        40        50		60
+			"11111111111111111111111111111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111111111111111111111111111",
+			"11111111111111111111111111111111111111111111111111111111111111111"
+		};
+		segment.data = segametData12;
+
+		segment.width = segment.data[0].Length;
+		segment.height = segment.data.Length;
+
+		segment.segmentStartPos = new MapPoint (41, 2);
+		segment.startPoint = new MapPoint (2, 36);
+		segment.endPoint = new MapPoint (39, 20);
+
+		segment.lockScreenLeft = false;
+		segment.lockScreenRight = false;
+		segment.lockScreenTop = true;
+		segment.lockScreenBottom = true;
+		segment.CalculateBorder ();
+
+
+
+		/*
+		elementQuestion = new LevelElementQuestion ( 11, 19, LevelElementQuestion.Type_CoinOne, LevelElementQuestion.Sprite_Question );
+		segment.elements.Add (elementQuestion);
+
+		elementQuestion = new LevelElementQuestion ( 12, 19, LevelElementQuestion.Type_CoinOne, LevelElementQuestion.Sprite_Question );
+		segment.elements.Add (elementQuestion);
+
+		elementPillar = new LevelElementPillar ( 58, 20, MapElement.Dir_Up, 7 );
+		segment.elements.Add (elementPillar);
+
+		/*
+		elementCoinArrow = new LevelElementCoinArrow ( 24, 21, MapElement.Dir_LeftUp );
+		segment.elements.Add (elementCoinArrow);
+
+
+
+
+	    elementStop = new LevelElementStop ( 35, 21, MapElementStop.StopType_Direct );
+		segment.elements.Add (elementStop);
+
+
+
+		enemyMushroom = new LevelElementEnemyMushroon (33, 18, MapElement.Dir_Left, MapElement.Dir_Left, 0);
+		segment.elements.Add (enemyMushroom);
+*/
 		levelDef.segments.Add (segment);
 
 		_localLevels.Add (levelDef);

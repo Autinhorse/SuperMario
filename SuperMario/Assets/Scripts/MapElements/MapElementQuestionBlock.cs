@@ -54,7 +54,7 @@ public class MapElementQuestionBlock : MapElement {
 
 		Sequence seq = DOTween.Sequence ();
 		seq.Append (SptMain.transform.DOMoveY (SptMain.transform.position.y + 0.5f, 0.1f).OnComplete( ()=> {
-			SptMain.sprite = GameMap.instance.SptWallFixed;
+			SptMain.sprite = GameMap.instance.SptWallFixedCorner4;
 			switch (_subtype) {
 			case LevelElementQuestion.Type_CoinOne:
 				go = (GameObject)GameObject.Instantiate (GameMap.instance.GoMapElementCoin);

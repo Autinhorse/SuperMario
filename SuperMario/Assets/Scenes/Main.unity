@@ -428,6 +428,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 717250628}
+  - {fileID: 643843738}
   m_Father: {fileID: 1962458051}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -715,7 +716,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -1048,6 +1049,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 687674956}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -1343,6 +1345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 0}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -1519,6 +1522,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 0}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -2088,6 +2092,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 0}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -2133,6 +2138,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1414582738}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -2661,6 +2667,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1963739486}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -2974,6 +2981,79 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &643843737
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 643843738}
+  - component: {fileID: 643843739}
+  m_Layer: 0
+  m_Name: SptWallFixedBorder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &643843738
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 643843737}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 27129027}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &643843739
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 643843737}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: 2a8ab7672a37a4eda9db416b8fff50f5, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
 --- !u!1 &644585509
 GameObject:
   m_ObjectHideFlags: 0
@@ -3056,7 +3136,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
+          m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -3601,6 +3681,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 73109010}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -3705,6 +3786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 356876912}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -3889,7 +3971,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: b89574345138b43f39fe01398d7ebef7, type: 3}
-  m_Color: {r: 0.8627451, g: 0.8627451, b: 0.78431374, a: 1}
+  m_Color: {r: 0.972549, g: 0.93333334, b: 0.8627451, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4082,6 +4164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 353659484}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -4127,6 +4210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1384019418}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -4495,6 +4579,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 0}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -4687,6 +4772,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 633158809}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -4901,6 +4987,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1579325279}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -4946,6 +5033,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 124185257}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -5117,6 +5205,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 12708800}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -5162,6 +5251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1672041224}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -5206,6 +5296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 0}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -5699,7 +5790,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -5908,7 +5999,8 @@ MonoBehaviour:
   GoMapElementBounceAward: {fileID: 69984756}
   GoMapElementCoinEject: {fileID: 2025822696}
   GoMapElementPiranha: {fileID: 46323208}
-  MapElementMainColor: {r: 0.2509804, g: 0.2509804, b: 0.2509804, a: 1}
+  MapElementMainColor: {r: 0.09411765, g: 0.6745098, b: 0.7294118, a: 0.49803922}
+  MapElementBorderColor: {r: 0.09411765, g: 0.6745098, b: 0.7294118, a: 1}
   SptCoinArrow01: {fileID: 21300000, guid: af1c4f55da2a3496da52583b546adfaf, type: 3}
   SptCoinArrow02: {fileID: 21300000, guid: b98c7ca4dbedd4a959de0da451de3a83, type: 3}
   SptStop01: {fileID: 21300000, guid: 290b3d89639874eaa8fa37065404d6c7, type: 3}
@@ -5917,7 +6009,33 @@ MonoBehaviour:
   SptStopArrow02: {fileID: 21300000, guid: b98c7ca4dbedd4a959de0da451de3a83, type: 3}
   SptQuestionBlock: {fileID: 21300000, guid: b98ae776da9d845cdae5d5e007919ab7, type: 3}
   SptQuestionBrick: {fileID: 21300000, guid: 6be49533a85d74cffb19ea672bc5b737, type: 3}
-  SptWallFixed: {fileID: 21300000, guid: 2a8ab7672a37a4eda9db416b8fff50f5, type: 3}
+  SptWallFixedFull: {fileID: 21300000, guid: 30993cb1c274242aca8cb2fdc27f4a84, type: 3}
+  SptWallFixedCorner1: {fileID: 21300000, guid: 2fd2be467051141cca0462ebf8c7f53f,
+    type: 3}
+  SptWallFixedCorner2: {fileID: 21300000, guid: 726e81564765c4ec09f671b7626aa276,
+    type: 3}
+  SptWallFixedCorner4: {fileID: 21300000, guid: 322ff8638ac0a462696fe0bab1d2f176,
+    type: 3}
+  SptWallBorder4: {fileID: 21300000, guid: 5bfe55abc6da84433954acda72ba74e5, type: 3}
+  SptWallBorder3: {fileID: 21300000, guid: a3525b6b1ea584db88d34185145d4d97, type: 3}
+  SptWallBorderL: {fileID: 21300000, guid: 1565a27c806644aa5b21f7f637fe9b37, type: 3}
+  SptWallBorderD: {fileID: 21300000, guid: abd83e2e1bf494ba695bd822e18a8f47, type: 3}
+  SptWallBorderLCorner: {fileID: 21300000, guid: 15a76d7cd0eac40669ab70655c719596,
+    type: 3}
+  SptWallBorder1: {fileID: 21300000, guid: a2d6765fb60364b65a9913dbf2b81ca9, type: 3}
+  SptWallBorderT: {fileID: 21300000, guid: 6757be45cd2fb404aa7edddd08d096d7, type: 3}
+  SptWallBorderT1: {fileID: 21300000, guid: 7c44d7cdcedae48969a428cb4ebb3a48, type: 3}
+  SptWallBorderT2: {fileID: 21300000, guid: 0d93fabe4a68749fda83766f42ec2a32, type: 3}
+  SptWallBorderCorner1: {fileID: 21300000, guid: bb5fba1d6624e436eb70dbf98f68456e,
+    type: 3}
+  SptWallBorderCorner2: {fileID: 21300000, guid: 254adc60dfc684095822c9321ef50126,
+    type: 3}
+  SptWallBorderCorner22: {fileID: 21300000, guid: 22bde6822fc48405491e556f6e1544c7,
+    type: 3}
+  SptWallBorderCorner3: {fileID: 21300000, guid: 21f8dc4b3798a4b03bd6959a3df97696,
+    type: 3}
+  SptWallBorderCorner4: {fileID: 21300000, guid: 72339fb37655340ae8449f9b0f98972a,
+    type: 3}
   SptAwardStar: {fileID: 21300000, guid: fade36ecbf7714b3b98cf90e14054fdc, type: 3}
   SptAwardLife: {fileID: 21300000, guid: 38eb628ee927b4bdd8c1cbe16bd4f417, type: 3}
   ScreenCoverMoveDuration: 1.2
@@ -7202,7 +7320,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -7583,6 +7701,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1869313224}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -7642,6 +7761,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1668248190}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -8171,6 +8291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 1202158593}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -8289,6 +8410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 717250629}
+  SptBorder: {fileID: 643843739}
   type: 0
   x: 0
   y: 0
@@ -8585,6 +8707,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 0}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0
@@ -8876,6 +8999,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SptMain: {fileID: 726611228}
+  SptBorder: {fileID: 0}
   type: 0
   x: 0
   y: 0

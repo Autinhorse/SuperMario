@@ -80,6 +80,7 @@ public class GameMap : MonoBehaviour {
 
 	[Header("----------Colors----------")]
 	public Color MapElementMainColor;
+	public Color MapElementBorderColor;
 
 	[Header("----------Sprites----------")]
 	public Sprite SptCoinArrow01;
@@ -92,7 +93,25 @@ public class GameMap : MonoBehaviour {
 
 	public Sprite SptQuestionBlock;
 	public Sprite SptQuestionBrick;
-	public Sprite SptWallFixed;
+
+	public Sprite SptWallFixedFull;
+	public Sprite SptWallFixedCorner1;
+	public Sprite SptWallFixedCorner2;
+	public Sprite SptWallFixedCorner4;
+	public Sprite SptWallBorder4;
+	public Sprite SptWallBorder3;
+	public Sprite SptWallBorderL;
+	public Sprite SptWallBorderD;
+	public Sprite SptWallBorderLCorner;
+	public Sprite SptWallBorder1;
+	public Sprite SptWallBorderT;
+	public Sprite SptWallBorderT1;
+	public Sprite SptWallBorderT2;
+	public Sprite SptWallBorderCorner1;
+	public Sprite SptWallBorderCorner2;
+	public Sprite SptWallBorderCorner22;
+	public Sprite SptWallBorderCorner3;
+	public Sprite SptWallBorderCorner4;
 
 	public Sprite SptAwardStar;
 	public Sprite SptAwardLife;
@@ -130,6 +149,8 @@ public class GameMap : MonoBehaviour {
 	float _timeValue;
 
 	LevelSegment _currentSegment;
+	Color _mainElementColor;
+	Color _mainElementBorderColor;
 
 	public int LeftBorder {
 		get {
@@ -336,6 +357,24 @@ public class GameMap : MonoBehaviour {
 
 			ActiveElement activeElement;
 
+			int[,] mapElementType = new int[segment.width, segment.height];
+
+			for (int x = 0; x < segment.width; x++) {
+				for (int y = 0; y < segment.height; y++) {
+					mapElementType[x,y] = Encoding.Default.GetBytes(segment.data[y].Substring(x,1))[0];
+
+					if (mapElementType[x,y] <= 57) {
+						mapElementType[x,y] -= 48;
+					}
+					else if (mapElementType[x,y] <= 90) {
+						mapElementType[x,y] -= 55;
+					}
+					else if (mapElementType[x,y] <= 122) {
+						mapElementType[x,y] -= 61;
+					}
+				}
+			}
+
 			for (int x = 0; x < segment.width; x++) {
 				for (int y = 0; y < segment.height; y++) {
 					mapPos.x = segment.segmentStartPos.x + x;
@@ -343,19 +382,9 @@ public class GameMap : MonoBehaviour {
 
 					activeElement = null;
 
-					elementType = Encoding.Default.GetBytes(segment.data[y].Substring(x,1))[0];
 
-					if (elementType <= 57) {
-						elementType -= 48;
-					}
-					else if (elementType <= 90) {
-						elementType -= 55;
-					}
-					else if (elementType <= 122) {
-						elementType -= 61;
-					}
 
-					switch (elementType) {
+					switch (mapElementType[x,y]) {
 					case MapElement.Type_None:
 						_mapElements [mapPos.x, mapPos.y] = null;
 						/*
@@ -367,14 +396,515 @@ public class GameMap : MonoBehaviour {
 						_mapElements [mapPos.x, mapPos.y] = (MapElement)targetGO.GetComponent<MapElement> ();*/
 						break;
 					case MapElement.Type_WallFixed:
-						targetGO = (GameObject)GameObject.Instantiate (GoMapElementWallFixed);
-						targetGO.transform.SetParent (GoGameMap.transform);
-						targetGO.transform.localPosition = GetWorldPositionByMapPoint (mapPos.x , mapPos.y);
-						targetGO.SetActive (true);
+						{
+							bool[,] isBlocked = new bool[3,3];
 
-						_mapElements [mapPos.x, mapPos.y] = (MapElement)targetGO.GetComponent<MapElement> ();
-						_mapElements [mapPos.x, mapPos.y].SetColor (MapElementMainColor);
-						break;
+							int targetElementType;
+
+							if (y > 0) {
+								if (x > 0) {
+									targetElementType = mapElementType [x - 1, y - 1];
+									isBlocked [0, 0] = ((targetElementType == MapElement.Type_WallFixed)
+										|| (targetElementType == MapElement.Type_WallSlope01)
+										|| (targetElementType == MapElement.Type_WallSlope01Follow)
+										|| (targetElementType == MapElement.Type_WallSlope02));
+								}
+								if( x<segment.width-1){
+									targetElementType = mapElementType [x + 1, y - 1];
+									isBlocked [2, 0] = ((targetElementType == MapElement.Type_WallFixed)
+										|| (targetElementType == MapElement.Type_WallSlope01)
+										|| (targetElementType == MapElement.Type_WallSlope01Follow)
+										|| (targetElementType == MapElement.Type_WallSlope02));
+								}
+
+								targetElementType = mapElementType [x, y - 1];
+								if ((targetElementType == MapElement.Type_WallFixed)
+									|| (targetElementType == MapElement.Type_WallSlope01)
+									|| (targetElementType == MapElement.Type_WallSlope01Follow)
+									|| (targetElementType == MapElement.Type_WallSlope02)) {
+									isBlocked[1,0] = true;
+								}
+							}
+							if (y < segment.height-1) {
+								if (x > 0) {
+									targetElementType = mapElementType [x - 1, y + 1];
+									isBlocked [0, 2] = ((targetElementType == MapElement.Type_WallFixed)
+										|| (targetElementType == MapElement.Type_WallSlope01)
+										|| (targetElementType == MapElement.Type_WallSlope01Follow)
+										|| (targetElementType == MapElement.Type_WallSlope02));
+								}
+
+								if( x<segment.width-1){
+									targetElementType = mapElementType [x + 1, y + 1];
+									isBlocked [2, 2] = ((targetElementType == MapElement.Type_WallFixed)
+										|| (targetElementType == MapElement.Type_WallSlope01)
+										|| (targetElementType == MapElement.Type_WallSlope01Follow)
+										|| (targetElementType == MapElement.Type_WallSlope02));
+								}
+
+								targetElementType = mapElementType [x, y + 1];
+								if ((targetElementType == MapElement.Type_WallFixed)
+									|| (targetElementType == MapElement.Type_WallSlope01)
+									|| (targetElementType == MapElement.Type_WallSlope01Follow)
+									|| (targetElementType == MapElement.Type_WallSlope02)) {
+									isBlocked[1,2] = true;
+								}
+							}
+							if (x > 0) {
+								targetElementType = mapElementType [x-1, y];
+								if ((targetElementType == MapElement.Type_WallFixed)
+									|| (targetElementType == MapElement.Type_WallSlope01)
+									|| (targetElementType == MapElement.Type_WallSlope01Follow)
+									|| (targetElementType == MapElement.Type_WallSlope02)) {
+									isBlocked[0,1] = true;
+								}
+							}
+							if (x < segment.width-1) {
+								targetElementType = mapElementType [x+1, y];
+								if ((targetElementType == MapElement.Type_WallFixed)
+									|| (targetElementType == MapElement.Type_WallSlope01)
+									|| (targetElementType == MapElement.Type_WallSlope01Follow)
+									|| (targetElementType == MapElement.Type_WallSlope02)) {
+										isBlocked[2,1] = true;
+								}
+							}
+
+							targetGO = (GameObject)GameObject.Instantiate (GoMapElementWallFixed);
+							targetGO.transform.SetParent (GoGameMap.transform);
+							targetGO.transform.localPosition = GetWorldPositionByMapPoint (mapPos.x, mapPos.y);
+							targetGO.SetActive (true);
+
+							_mapElements [mapPos.x, mapPos.y] = (MapElement)targetGO.GetComponent<MapElement> ();
+
+
+							MapElementWallFixed wallFixed = (MapElementWallFixed)_mapElements [mapPos.x, mapPos.y];
+							//八个方向都有墙
+							if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+							    && (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+							    && (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.gameObject.SetActive (false);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor);
+							}
+							// 单独的一块
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == false) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == false)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == false) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner4;
+								wallFixed.SptBorder.sprite = SptWallBorder4;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有但是四个角没有
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner4;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，右上角有
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner3;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，右下角有
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner3;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，左下角有
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner3;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，左上角有
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner3;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，上面两个角有
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner2;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，右面两个角有
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner2;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，下面两个角有
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner2;
+								//wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有，左面两个角有
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner2;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有,左上右下对面两个角有
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner22;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 四面都有,右上左下对面两个角有
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner22;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在左上角，对面有方块
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == false) 
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								wallFixed.SptBorder.sprite = SptWallBorderL;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在左下角，对面有方块
+							else if ((isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								wallFixed.SptBorder.sprite = SptWallBorderL;
+								//wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在右上角，对面有方块
+							else if ( (isBlocked [1, 0] == false) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								wallFixed.SptBorder.sprite = SptWallBorderL;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在右下角，对面有方块
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) 
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [1, 2] == false) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptBorder.sprite = SptWallBorderL;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在左上角，对面有方块
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == false) 
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								wallFixed.SptBorder.sprite = SptWallBorderLCorner;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在左下角，对面有方块
+							else if ((isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								wallFixed.SptBorder.sprite = SptWallBorderLCorner;
+								//wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在右上角，对面有方块
+							else if ( (isBlocked [1, 0] == false) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								wallFixed.SptBorder.sprite = SptWallBorderLCorner;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// L形状在右下角，对面有方块
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) 
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [1, 2] == false) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner1;
+								wallFixed.SptBorder.sprite = SptWallBorderLCorner;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向下
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == false) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向左
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向上
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == false) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向右
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向下，多一个角
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == false) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向左，多一个角
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向上，多一个角
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == false) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT1;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向右，多一个角
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向下，多一个角
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == false) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT2;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向左，多一个角
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT2;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向上，多一个角
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == false) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT2;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// T形状，向右，多一个角
+							else if ((isBlocked [0, 0] == false) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == false) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderT2;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 2x3形状，向下
+							else if ( (isBlocked [1, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorder1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 2x3形状，向左
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) 
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorder1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 2x3形状，向上
+							else if ((isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [1, 2] == false) ) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorder1;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 2x3形状，向右
+							else if ((isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								 && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorder1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 向下突出一个
+							else if ((isBlocked [1, 0] == true)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == false)
+								&& (isBlocked [1, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner2;
+								wallFixed.SptBorder.sprite = SptWallBorder3;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 向上突出一个
+							else if ((isBlocked [1, 0] == false)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == false)
+								&& (isBlocked [1, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner2;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								wallFixed.SptBorder.sprite = SptWallBorder3;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 向右突出一个
+							else if ((isBlocked [1, 0] == false)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == false)
+								&& (isBlocked [1, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner2;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								wallFixed.SptBorder.sprite = SptWallBorder3;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 向左突出一个
+							else if ((isBlocked [1, 0] == false)
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == true)
+								&& (isBlocked [1, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedCorner2;
+								wallFixed.SptMain.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								wallFixed.SptBorder.sprite = SptWallBorder3;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 左右直通，上下无
+							else if ( (isBlocked [1, 0] == false) 
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [1, 2] == false)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderD;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 上下直通，左右无
+							else if ( (isBlocked [1, 0] == true) 
+								&& (isBlocked [0, 1] == false) && (isBlocked [2, 1] == false)
+								&& (isBlocked [1, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderD;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 一个角缺墙
+							// 左上角缺
+							else if ( (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+							         && (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+							         && (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner1;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 右上角缺
+							else if ( (isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) 
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 270);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 右下角缺
+							else if ( (isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+								&& (isBlocked [0, 2] == true) && (isBlocked [1, 2] == true) ) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 180);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							}
+							// 左下角缺
+							else if ( (isBlocked [0, 0] == true) && (isBlocked [1, 0] == true) && (isBlocked [2, 0] == true)
+								&& (isBlocked [0, 1] == true) && (isBlocked [2, 1] == true)
+							    && (isBlocked [1, 2] == true) && (isBlocked [2, 2] == true)) {
+								wallFixed.SptMain.sprite = SptWallFixedFull;
+								wallFixed.SptBorder.sprite = SptWallBorderCorner1;
+								wallFixed.SptBorder.transform.localEulerAngles = new Vector3 (0, 0, 90);
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor, _mainElementBorderColor);
+							} else {
+								wallFixed.SptMain.sprite = SptWallFixedCorner4;
+								wallFixed.SptBorder.sprite = SptWallBorder4;
+								_mapElements [mapPos.x, mapPos.y].SetColor (_mainElementColor,_mainElementBorderColor);
+							}
+							break;
+						}
 					case MapElement.Type_WallBoard:
 						targetGO = (GameObject)GameObject.Instantiate (GoMapElementWallBoard);
 						targetGO.transform.SetParent (GoGameMap.transform);
@@ -882,6 +1412,7 @@ public class GameMap : MonoBehaviour {
 
 		Vector3 pos = Actor.transform.position;
 		cameraPos.x=pos.x+3;
+		MapPoint actorMapPoint = GetMapPointOfWorldPosition (pos);
 
 		if (pos.y - cameraPos.y > 5) {
 			cameraPos.y = pos.y - 5;
@@ -891,31 +1422,38 @@ public class GameMap : MonoBehaviour {
 		}
 
 		//if (_mapElements [_actorMapPosX, _actorMapPosY] != null) {
-		_currentSegment = _mapElementSegment [_actorMapPosX, _actorMapPosY].segment;
+		if ((actorMapPoint.x < 0) || (actorMapPoint.x >= _mapElementSegment.GetUpperBound (0))
+		   || (actorMapPoint.y < 0) || (actorMapPoint.y >= _mapElementSegment.GetUpperBound (1))) {
+			int test = 0;
+			test++;
+		}
+		else {
+			_currentSegment = _mapElementSegment [actorMapPoint.x, actorMapPoint.y].segment;
 
-		if (_currentSegment.lockScreenLeft) {
-			if (cameraPos.x < _currentSegment.leftTopPosition.x + _screenWidth / 2+1) {
-				cameraPos.x = _currentSegment.leftTopPosition.x + _screenWidth / 2+1;
+			if (_currentSegment.lockScreenLeft) {
+				if (cameraPos.x < _currentSegment.leftTopPosition.x + _screenWidth / 2+1) {
+					cameraPos.x = _currentSegment.leftTopPosition.x + _screenWidth / 2+1;
 				}
 			}
-		if(_currentSegment.lockScreenRight){
-			if (cameraPos.x > _currentSegment.rightBottomPosition.x - _screenWidth / 2) {
-				cameraPos.x = _currentSegment.rightBottomPosition.x - _screenWidth / 2;
+			if(_currentSegment.lockScreenRight){
+				if (cameraPos.x > _currentSegment.rightBottomPosition.x - _screenWidth / 2) {
+					cameraPos.x = _currentSegment.rightBottomPosition.x - _screenWidth / 2;
 				}
 			}
-		if (_currentSegment.lockScreenTop) {
-			if (cameraPos.y > _currentSegment.leftTopPosition.y - _screenHeight / 2) {
-				cameraPos.y = _currentSegment.leftTopPosition.y - _screenHeight / 2;
+			if (_currentSegment.lockScreenTop) {
+				if (cameraPos.y > _currentSegment.leftTopPosition.y - _screenHeight / 2) {
+					cameraPos.y = _currentSegment.leftTopPosition.y - _screenHeight / 2;
 				}
 			}
-		if(_currentSegment.lockScreenBottom){
-			if (cameraPos.y < _currentSegment.rightBottomPosition.y + _screenHeight / 2 + 1) {
-				cameraPos.y = _currentSegment.rightBottomPosition.y + _screenHeight / 2 + 1;
+			if(_currentSegment.lockScreenBottom){
+				if (cameraPos.y < _currentSegment.rightBottomPosition.y + _screenHeight / 2 + 1) {
+					cameraPos.y = _currentSegment.rightBottomPosition.y + _screenHeight / 2 + 1;
 				}
 			}
-		//}
+			MainCamera.transform.position = cameraPos;
+		}
 
-		MainCamera.transform.position = cameraPos;
+
 	}
 
 	public void StartGame() {
@@ -1060,8 +1598,13 @@ public class GameMap : MonoBehaviour {
 	}
 
 	public void OnButtonSelectLevel( int level ) {
+		if (level >= _levels.GetLevelDefNumber ()) {
+			level = 0;
+		}
+		_mainElementColor = MapElementMainColor;
+		_mainElementBorderColor = MapElementBorderColor;
 
-		CreateLevel (_levels.GetLevelDef (0));
+		CreateLevel (_levels.GetLevelDef (level));
 
 		Vector3 actorPos = GetActorCurrentPosition ();
 		actorPos.z = -25;

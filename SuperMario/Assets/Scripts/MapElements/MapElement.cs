@@ -52,8 +52,8 @@ public class MapElement : MonoBehaviour {
 	public const int Type_WallSlope03Follow = 14; 		// E 这个是1:2下坡后面一个
 	public const int Type_EndFollow = 15; 				// F 这个是结束位置上面一个
 	public const int Type_WallSlopeBottom = 16;			// G 斜坡下面
-	public const int Type_Spring = 17;					// H 斜坡下面
-	public const int Type_SpringFollow = 18;			// I 斜坡下面
+	public const int Type_Spring = 17;					// H 弹簧
+	public const int Type_SpringFollow = 18;			// I 弹簧其余位置
 
 
 	public const int Type_CoinArrow = 10001;			// 这个是一个金币产生器，沿指定方向产生四个金币
@@ -69,6 +69,7 @@ public class MapElement : MonoBehaviour {
 	public const int Type_PiranhaFollow = 10011;		// 食人花的占位元素
 
 	public SpriteRenderer SptMain;
+	public SpriteRenderer SptBorder;
 
 	[HideInInspector]
 	public int type;
@@ -98,9 +99,19 @@ public class MapElement : MonoBehaviour {
 		
 	}
 
-	public void SetColor( Color color ) {
+	public void SetColor( Color mainColor ) {
 		if (SptMain != null) {
-			SptMain.color = color;
+			SptMain.color = mainColor;
+		}
+	}
+
+	public void SetColor( Color mainColor, Color borderColor ) {
+		if (SptMain != null) {
+			SptMain.color = mainColor;
+		}
+
+		if (SptBorder != null) {
+			SptBorder.color = borderColor;
 		}
 	}
 
